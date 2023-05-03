@@ -1,8 +1,8 @@
 import pygraphviz as pgv
-import time
-import json
 import networkx as nx
 from networkx.algorithms import centrality
+
+from fc00.utils import now
 
 def position_nodes(nodes, edges):
     G = pgv.AGraph(strict=True, directed=False, size='10!')
@@ -35,7 +35,7 @@ def canonalize_ip(ip):
     return ':'.join( i.rjust(4, '0') for i in ip.split(':') )
 
 def load_db():
-    with open('nodedb/nodes') as f:
+    with open('./nodes') as f:
         return dict([ (canonalize_ip(v[0]), v[1]) for v in [ l.split(None)[:2] for l in f.readlines() ] if len(v) > 1 ])
 
 def get_graph_json(G):
@@ -44,10 +44,11 @@ def get_graph_json(G):
         neighbors = len(G.neighbors(n))
         if neighbors > max_neighbors:
             max_neighbors = neighbors
-    print 'Max neighbors: %d' % max_neighbors
+
+    #print('Max neighbors: %d' % max_neighbors)
 
     out_data = {
-        'created': int(time.time()),
+        'created': int(now().timestamp()),
         'nodes': [],
         'edges': []
     }
@@ -66,7 +67,7 @@ def get_graph_json(G):
         out_data['nodes'].append({
             'id': n.name,
             'label': name if name else n.attr['label'],
-            'name': name,
+            'name': name or '',
             'version': n.attr['version'],
             'x': float(pos[0]),
             'y': float(pos[1]),
@@ -81,7 +82,7 @@ def get_graph_json(G):
             'targetID': e[1]
         })
 
-    return json.dumps(out_data)
+    return out_data
 
 
 def _gradient_color(ratio, colors):
@@ -97,4 +98,4 @@ def _gradient_color(ratio, colors):
     g = a[1] + (b[1] - a[1]) * ratio
     b = a[2] + (b[2] - a[2]) * ratio
 
-    return '#%02x%02x%02x' % (r, g, b)
+    return '#%02x%02x%02x' % (int(r), int(g), int(b))

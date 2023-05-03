@@ -4,3 +4,6 @@ graph.json
 web_config.cfg
 lighttp.conf
 mapper-confs/
+venv/
+*.egg-info
+*.sqlite
