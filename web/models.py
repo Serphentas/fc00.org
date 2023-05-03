@@ -1,3 +1,4 @@
+import datetime as dt
 import time
 
 from web import DB
@@ -14,8 +15,8 @@ class Node(DB.Model):
     )
     label = DB.Column(DB.String)
     version = DB.Column(DB.Integer)
-    first_seen = DB.Column(DB.DateTime)
-    last_seen = DB.Column(DB.DateTime)
+    first_seen = DB.Column(DB.Time)
+    last_seen = DB.Column(DB.Time)
 
     def __init__(self, ip, label, version, first_seen, last_seen):
         if not valid_cjdns_ip(ip):
@@ -45,14 +46,14 @@ class Node(DB.Model):
 
     @classmethod
     def get_nodes(cls, time_limit):
-        since = int(time.time() - time_limit)
+        since = time.time() - time_limit
         db_nodes = cls.query.filter(cls.last_seen > since).all()
 
         return {x.ip: GraphNode(x.ip, x.version, x.label) for x in db_nodes}
 
     @classmethod
     def insert(cls, node):
-        now = int(time.time())
+        now = dt.datetime.now().time()
 
         db_node = cls.query.filter_by(ip=node.ip).first()
         if db_node:
@@ -75,40 +76,42 @@ class Edge(DB.Model):
 
     a = DB.Column(
         DB.String,
-        primary_key=True
+        DB.ForeignKey('nodes.ip'),
+        primary_key=True,
     )
     b = DB.Column(
         DB.String,
+        DB.ForeignKey('nodes.ip'),
         primary_key=True
     )
-    first_seen = DB.Column(DB.DateTime)
-    last_seen = DB.Column(DB.DateTime)
+    first_seen = DB.Column(DB.Time)
+    last_seen = DB.Column(DB.Time)
     uploaded_by = DB.Column(DB.String)
 
     def __init__(self, a, b, first_seen, last_seen, uploaded_by):
-        self.a, self.b = sorted([a, b])
+        self.a, self.b = a, b
         self.first_seen = first_seen
         self.last_seen = last_seen
         self.uploaded_by = uploaded_by
 
     def __eq__(self, that):
-        return self.a.ip == that.a.ip and self.b.ip == that.b.ip
+        return self.a == that.a and self.b == that.b
 
     def __repr__(self):
-        return 'Edge(a.ip="{}", b.ip="{}")'.format(
-            self.a.ip,
-            self.b.ip
+        return 'Edge(a="{}", b="{}")'.format(
+            self.a,
+            self.b
         )
 
     @classmethod
     def get_edges(cls, time_limit, nodes):
-        since = int(time.time() - time_limit)
+        since = time.time() - time_limit
         db_edges = cls.query.filter(cls.last_seen > since).all()
 
         edges = []
         for e in db_edges:
             try:
-                edges.append(GraphEdge(nodes[e['a']], nodes[e['b']]))
+                edges.append(GraphEdge(nodes[e.a], nodes[e.b]))
             except KeyError:
                 pass
 
@@ -116,29 +119,29 @@ class Edge(DB.Model):
 
     @classmethod
     def insert(cls, edge, uploaded_by):
-        now = int(time.time())
+        now = dt.datetime.now().time()
 
-        db_edge = Edge.query.filter_by(a=edge.a, b=edge.b).first()
+        db_edge = Edge.query.filter_by(a=edge.a.ip, b=edge.b.ip).first()
         if db_edge:
-            db_node.last_seen = now
+            db_edge.last_seen = now
         else:
             db_edge = Edge(
-                edge.a, edge.b,
-                now. now,
-                edge.uploaded_by
+                edge.a.ip, edge.b.ip,
+                now, now,
+                uploaded_by
             )
 
         DB.session.add(db_edge)
         DB.session.commit()
 
-def insert_graph(self, nodes, edges, uploaded_by):
-    for n in nodes.itervalues():
-        Node.insert(n)
+def insert_graph(nodes, edges, uploaded_by):
+    for ip in nodes:
+        Node.insert(nodes[ip])
 
     for e in edges:
         Edge.insert(e, uploaded_by)
 
-def get_graph(self, time_limit):
+def get_graph(time_limit):
     nodes = Node.get_nodes(time_limit)
     edges = Edge.get_edges(nodes, time_limit)
     return (nodes, edges)

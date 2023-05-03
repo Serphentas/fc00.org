@@ -24,7 +24,7 @@ class GraphEdge:
         return self.a.ip == that.a.ip and self.b.ip == that.b.ip
 
     def __repr__(self):
-        return 'Edge(a.ip="{}", b.ip="{}")'.format(
+        return 'Edge(a="{}", b="{}")'.format(
             self.a.ip,
             self.b.ip
         )

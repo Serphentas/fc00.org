@@ -34,7 +34,7 @@ def canonalize_ip(ip):
     return ':'.join( i.rjust(4, '0') for i in ip.split(':') )
 
 def load_db():
-    with open('nodedb/nodes') as f:
+    with open('./nodes') as f:
         return dict([ (canonalize_ip(v[0]), v[1]) for v in [ l.split(None)[:2] for l in f.readlines() ] if len(v) > 1 ])
 
 def get_graph_json(G):
@@ -52,7 +52,7 @@ def get_graph_json(G):
     }
 
     centralities = compute_betweenness(G)
-    #db = load_db()
+    db = load_db()
 
     for n in G.iternodes():
         neighbor_ratio = len(G.neighbors(n)) / float(max_neighbors)
@@ -60,8 +60,7 @@ def get_graph_json(G):
         centrality = centralities.get(n.name, 0)
         pcentrality = (centrality + 0.0001) * 500
         size = (pcentrality ** 0.3 / 500) * 1000 + 1
-        #name = db.get(n.name)
-        name = None
+        name = db.get(n.name)
 
         out_data['nodes'].append({
             'id': n.name,
@@ -97,4 +96,4 @@ def _gradient_color(ratio, colors):
     g = a[1] + (b[1] - a[1]) * ratio
     b = a[2] + (b[2] - a[2]) * ratio
 
-    return '#%02x%02x%02x' % (r, g, b)
+    return '#%02x%02x%02x' % (int(r), int(g), int(b))

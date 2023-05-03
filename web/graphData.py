@@ -1,13 +1,11 @@
 import json
-from web.models import Node, Edge, insert_graph
+from web.models import insert_graph
+from web.graphModel import GraphEdge, GraphNode
 import traceback
 import time
 
 def insert_graph_data(config, data, mail, ip, version):
-    try:
-        graph_data = json.loads(data)
-    except ValueError:
-        return 'Invalid JSON'
+    graph_data = data['data']
 
     log = '[%s] ip: %s, version: %d, mail: %r, nodes: %d, edges: %d' % (
         time.strftime('%Y-%m-%d %H:%M:%S'), ip,
@@ -28,17 +26,17 @@ def insert_graph_data(config, data, mail, ip, version):
     try:
         for n in graph_data['nodes']:
             try:
-                node = Node(n['ip'], version=n['version'])
+                node = GraphNode(n['ip'], version=n['version'])
                 nodes[n['ip']] = node
             except Exception:
-                pass
+                print(e)
 
         for e in graph_data['edges']:
             try:
-                edge = Edge(nodes[e['a']], nodes[e['b']])
+                edge = GraphEdge(nodes[e['a']], nodes[e['b']])
                 edges.append(edge)
-            except Exception:
-                pass
+            except Exception as e:
+                print(e)
     except Exception:
         return 'Invalid JSON nodes'
 
