@@ -1,6 +1,5 @@
 import pygraphviz as pgv
 import time
-import json
 import networkx as nx
 from networkx.algorithms import centrality
 
@@ -44,7 +43,7 @@ def get_graph_json(G):
         neighbors = len(G.neighbors(n))
         if neighbors > max_neighbors:
             max_neighbors = neighbors
-    print 'Max neighbors: %d' % max_neighbors
+    print('Max neighbors: %d' % max_neighbors)
 
     out_data = {
         'created': int(time.time()),
@@ -53,7 +52,7 @@ def get_graph_json(G):
     }
 
     centralities = compute_betweenness(G)
-    db = load_db()
+    #db = load_db()
 
     for n in G.iternodes():
         neighbor_ratio = len(G.neighbors(n)) / float(max_neighbors)
@@ -61,12 +60,13 @@ def get_graph_json(G):
         centrality = centralities.get(n.name, 0)
         pcentrality = (centrality + 0.0001) * 500
         size = (pcentrality ** 0.3 / 500) * 1000 + 1
-        name = db.get(n.name)
+        #name = db.get(n.name)
+        name = None
 
         out_data['nodes'].append({
             'id': n.name,
             'label': name if name else n.attr['label'],
-            'name': name,
+            'name': name or '',
             'version': n.attr['version'],
             'x': float(pos[0]),
             'y': float(pos[1]),
@@ -81,7 +81,7 @@ def get_graph_json(G):
             'targetID': e[1]
         })
 
-    return json.dumps(out_data)
+    return out_data
 
 
 def _gradient_color(ratio, colors):

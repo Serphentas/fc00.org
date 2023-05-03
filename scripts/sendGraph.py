@@ -70,7 +70,9 @@ def main():
         peers, node_ip = result_queue.get()
         get_edges_for_peers(edges, peers, node_ip)
 
-    send_graph(nodes, edges)
+    graph = get_graph(nodes, edges)
+    send_graph(graph)
+
     sys.exit(0)
 
 def worker(nodes, get_peer_queue, result, verbose=False):
@@ -228,11 +230,11 @@ def get_edges_for_peers(edges, peers, node_ip):
             edges[A].append(edge)
 
 
-def send_graph(nodes, edges):
+def get_graph(nodes, edges):
     graph = {
         'nodes': [],
         'edges': [edge for sublist in edges.values()
-                   for edge    in sublist],
+                   for edge in sublist],
     }
 
     for node in nodes.values():
@@ -241,13 +243,13 @@ def send_graph(nodes, edges):
             'version': node['version'],
         })
 
-    print('Nodes: {:d}\nEdges: {:d}\n'.format(len(nodes), len(edges)))
+    print(json.dumps(graph))
 
-    json_graph = json.dumps(graph)
+    return {'data': graph, 'mail': your_mail, 'version': 2}
+
+def send_graph(payload):
     print('Sending data to {:s}...'.format(url))
-
-    payload = {'data': json_graph, 'mail': your_mail, 'version': 2}
-    r = requests.post(url, data=payload)
+    r = requests.post(url, data=json.dumps(payload))
 
     if r.text == 'OK':
         print('Done!')

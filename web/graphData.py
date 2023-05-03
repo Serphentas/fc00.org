@@ -1,6 +1,5 @@
 import json
-from database import NodeDB
-from graph import Node, Edge
+from web.models import Node, Edge, insert_graph
 import traceback
 import time
 
@@ -43,18 +42,13 @@ def insert_graph_data(config, data, mail, ip, version):
     except Exception:
         return 'Invalid JSON nodes'
 
-    print "Accepted %d nodes and %d links." % (len(nodes), len(edges))
+    print("Accepted %d nodes and %d links." % (len(nodes), len(edges)))
 
     if len(nodes) == 0 or len(edges) == 0:
         return 'No valid nodes or edges'
 
     uploaded_by = ip
 
-    try:
-        with NodeDB(config) as db:
-            db.insert_graph(nodes, edges, uploaded_by)
-    except Exception:
-        traceback.print_exc()
-        return 'Database failure'
+    insert_graph(nodes, edges, uploaded_by)
 
     return None

@@ -6,7 +6,7 @@
 		Links: <span id="number-of-connections">-</span><br>
 		Updated <span id="update-time">-</span><br>
 	</div>
-	
+
 	<div id="sidebar">
 		<div id="search-wrapper">
 			<input id="search-box" class="tt" type="text" placeholder="Search nodes...">
@@ -18,5 +18,8 @@
 		<canvas id="map"></canvas>
 	</div>
 
+	<script>
+		let graphURL = "{{ url_for('network_graph') }}";
+	</script>
 	<script type="text/javascript" src="static/network.js"></script>
 {% endblock %}

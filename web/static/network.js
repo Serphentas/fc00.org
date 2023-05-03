@@ -202,7 +202,7 @@ $(document).ready(function() {
     updateCanvasSize();
 
 
-    jQuery.getJSON('/static/graph.json', function(data) {
+    jQuery.getJSON(graphURL, function(data) {
         nodes = data.nodes;
         edges = data.edges;
 
