@@ -1,4 +1,4 @@
-from web.utils import valid_cjdns_ip, valid_cjdns_version
+from fc00.utils import valid_cjdns_ip, valid_cjdns_version
 
 class GraphNode:
     def __init__(self, ip, version=None, label=None):
@@ -10,7 +10,7 @@ class GraphNode:
         return self.ip < that.ip
 
     def __repr__(self):
-        return 'Node(ip="{}", version={}, label="{}")' % (
+        return 'Node(ip="{}", version={}, label="{}")'.format(
             self.ip,
             self.version,
             self.label

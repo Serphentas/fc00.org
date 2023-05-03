@@ -1,7 +1,8 @@
 import pygraphviz as pgv
-import time
 import networkx as nx
 from networkx.algorithms import centrality
+
+from fc00.utils import now
 
 def position_nodes(nodes, edges):
     G = pgv.AGraph(strict=True, directed=False, size='10!')
@@ -43,10 +44,11 @@ def get_graph_json(G):
         neighbors = len(G.neighbors(n))
         if neighbors > max_neighbors:
             max_neighbors = neighbors
-    print('Max neighbors: %d' % max_neighbors)
+
+    #print('Max neighbors: %d' % max_neighbors)
 
     out_data = {
-        'created': int(time.time()),
+        'created': int(now().timestamp()),
         'nodes': [],
         'edges': []
     }

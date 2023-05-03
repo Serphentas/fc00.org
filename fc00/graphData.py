@@ -1,15 +1,17 @@
 import json
-from web.models import insert_graph
-from web.graphModel import GraphEdge, GraphNode
+from fc00.models import insert_graph
+from fc00.graphModel import GraphEdge, GraphNode
 import traceback
 import time
 
 def insert_graph_data(config, data, mail, ip, version):
     graph_data = data['data']
 
-    log = '[%s] ip: %s, version: %d, mail: %r, nodes: %d, edges: %d' % (
-        time.strftime('%Y-%m-%d %H:%M:%S'), ip,
-        version, mail, len(graph_data['nodes']), len(graph_data['edges']))
+    log = '[{TIME}] ip: {IP}, version: {VERSION}, mail: {MAIL}, nodes: {NODES}, edges: {EDGES}'.format(
+        TIME=time.strftime('%Y-%m-%d %H:%M:%S'),
+        IP=ip, VERSION=version, MAIL=mail,
+        NODES=len(graph_data['nodes']), EDGES=len(graph_data['edges'])
+    )
 
     with open(config['LOG'], 'a') as f:
         f.write(log + '\n')

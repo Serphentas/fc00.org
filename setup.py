@@ -1,9 +1,9 @@
 from setuptools import setup
 
 setup(
-    name='web',
+    name='fc00.org',
     version='0.1.0',
-    packages=['web'],
+    packages=['fc00'],
     include_package_data=True,
     install_requires=[
         'flask',

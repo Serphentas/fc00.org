@@ -1,11 +1,12 @@
 from flask import render_template, request
 
-from web import APP
-from web.models import Node, Edge
-from web.graphData import insert_graph_data
-from web.graphPlotter import position_nodes, get_graph_json
+from fc00 import APP
+from fc00.models import Node, Edge
+from fc00.graphData import insert_graph_data
+from fc00.graphPlotter import position_nodes, get_graph_json
 
-GRAPH_TIME_LIMIT = 60*60*3
+NODE_GRAPH_TIME_LIMIT = 60*60*3
+EDGE_GRAPH_TIME_LIMIT = 60*60*24*7
 
 def get_ip():
         try:
@@ -26,9 +27,8 @@ def page_network():
 @APP.route('/network/graph')
 def network_graph():
     # logic used to be once on startup, wrote to static/graph.json
-    nodes = Node.get_nodes(GRAPH_TIME_LIMIT)
-    edges = Edge.get_edges(60*60*24*7, nodes)
-    print('%d nodes, %d edges' % (len(nodes), len(edges)))
+    nodes = Node.get_nodes(NODE_GRAPH_TIME_LIMIT)
+    edges = Edge.get_edges(EDGE_GRAPH_TIME_LIMIT, nodes)
 
     return get_graph_json(
         position_nodes(nodes, edges)

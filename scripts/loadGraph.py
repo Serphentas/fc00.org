@@ -9,8 +9,8 @@ CWD = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
 sys.path.insert(0, os.path.dirname(CWD))
 
 import json
-from web.graphData import insert_graph_data
-from web import APP
+from fc00.graphData import insert_graph_data
+from fc00 import APP
 
 with APP.app_context():
 
